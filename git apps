@@ -1,0 +1,21 @@
+==> git init
+==> git add .
+==> git commit -m "first commit"
+==> git remote add origin https://github.com/ravindar75/asstn.git
+==> git push -u origin master
+==> git checkout -b "staging"
+==> git branch --all
+==> git checkout staging
+==> git stash save
+==> git status
+==> git checkout staging
+==> git stash apply
+==> git diff
+==> git checkout .ruby-version
+==> git commit -am "adds"
+==> git checkout staging
+==> git push origin stagin
+==> git stash clear
+==> git stash list
+==> git stash pop
+==> git remote add branchname

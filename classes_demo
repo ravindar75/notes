@@ -1,0 +1,511 @@
+==> what is method?
+    method is collection of statements
+==>  what is interpolation?
+	within in a string print varailbles 
+==> what is the meaning of * in arguments
+	if * is there in arguments its will accepts array as a argument
+==> what is meaning of & oparator in arguments 
+	it will accepts block  as argument 
+==> waht is block ?
+	block is collection of statements
+	blocks are not objects in ruby
+	blocks can be defined using {} or do end 
+==> yield : in ruby yield is used to invoke block
+	    in rails yield is used invoke template
+  
+
+
+what is class in ruby ::
+
+class:: 
+
+1. class is a blue print for creating objects
+2. class is instance of Class in ruby whenever we create new class it will instanciates Class class in ruby
+3. In ruby there will be class hierarchy and in this hierarchy either BasicObject or Object class is the top most class based on
+   version of ruby,in ruby 1.8.x Object is the top most class and from 1.9.x onwards BasicObject is the top most class in ruby
+
+   Class.superclass
+       => Module 
+   Class.superclass.superclass
+       => Object (1.8.x)
+   Class.superclass.superclass.superclass
+       => BasicObject (> 1.9.x)
+   Class.superclass.superclass.superclass.superclass
+       => nil 
+
+4. class may consists of 
+    a. instance methods(public,protected,private)
+    b. self methods
+    c. class variables
+    d. instance variables
+    e. either included or extended modules
+    f. sub class  (can we define a class inside a class?  YES)
+    g. constructor i.e.  initialize method (what is constructor in ruby?  in Ruby initialixe method will acts as constructor)
+    h. attr_accessors == attre_reader,attr_writer
+    i. delegated methods or attributes
+5. creating a new class
+    # name of the class should be allways in camelcase format ex:  Sample  SampleDemo  SampleDemoController
+    # without contructor i.e without initialize method
+    class Sample
+
+    end
+
+    class SampleDemo
+  
+    end
+ 
+    # creating objects
+
+     @s1 = Sample.new
+     @sd1 = SampleDemo.new
+
+    # creating a class with initialize method(constructor)
+
+    class Sample
+      def initialize(first_name,last_name,location,country)
+        @first_name = first_name
+        @last_name = last_name
+        @location = location
+        @country = country
+      end
+    end
+   # creating objects for classes with constructor i.e. initialize method
+
+    @s1 = Sample.new("Satish","Tandu","hyderabad","india")
+    @s1.first_name  #satish
+    @s1.last_name   # tandu
+
+:: what is the difference between instance methods and self methods
+6. defining a instance methods in class
+
+   class Sample
+
+     def s1
+       puts "s1"
+     end
+
+     def s2 
+       puts "s2"
+    end
+  end
+ 
+  # calling a instance methods defined inside class
+   1. to call instance methods in class we need to create a object for class
+
+   @sample_demo = Sample.new
+   @sample_demo.s1
+   @sample_demo.s2
+
+7. defining self methods in class
+
+    class SampleSelf
+      def SampleSelf.get_user
+       puts "first way of defining a self method"
+      end
+      def self.get_user_v2
+       puts "second way of defining a self method"
+      end
+      class << self
+        def get_user_v3
+          puts "third way of defing a self method"
+        end
+        def get_user_v4
+          puts "third way of defing a self method"
+        end
+        def get_user_v5
+          puts "third way of defing a self method"
+        end
+      end
+   end
+# calling a self methods::
+
+   1. self method will called on class itself no need to create object  i.e ClassName.methodname
+
+  2.5.0 :001 > class SampleSelf
+2.5.0 :002?>         def SampleSelf.get_user
+2.5.0 :003?>            puts "first way of defining a self method"
+2.5.0 :004?>           end
+2.5.0 :005?>         def self.get_user_v2
+2.5.0 :006?>            puts "second way of defining a self method"
+2.5.0 :007?>           end
+2.5.0 :008?>         class << self
+2.5.0 :009?>             def get_user_v3
+2.5.0 :010?>                 puts "third way of defing a self method"
+2.5.0 :011?>               end
+2.5.0 :012?>             def get_user_v4
+2.5.0 :013?>                 puts "third way of defing a self method"
+2.5.0 :014?>               end
+2.5.0 :015?>             def get_user_v5
+2.5.0 :016?>                 puts "third way of defing a self method"
+2.5.0 :017?>               end
+2.5.0 :018?>           end
+2.5.0 :019?>      end
+ => :get_user_v5 
+2.5.0 :020 > 
+2.5.0 :021 > 
+2.5.0 :022 > SampleSelf.get_user
+first way of defining a self method
+ => nil 
+2.5.0 :023 > SampleSelf.get_user_v2
+second way of defining a self method
+ => nil 
+2.5.0 :024 > SampleSelf.get_user_v3
+third way of defing a self method
+ => nil 
+2.5.0 :025 > SampleSelf.get_user_v4
+third way of defing a self method
+ => nil 
+2.5.0 :026 > SampleSelf.get_user_v5
+third way of defing a self method
+ => nil 
+2.5.0 :027 > 
+
+
+## defining class variables
+
+  class SampleClassVaribleDemo
+    @@v1 = 100
+    @@v2 = 200
+
+    def get_user
+     puts @@v1
+     puts @@v2
+    end
+
+    def self.get_user_v1
+     puts @@v1
+     puts @@v2
+    end
+  end
+
+@scv = SampleClassVaribleDemo.new
+@scv.get_user
+SampleClassVaribleDemo.get_user_v1
+
+
+##Defining a instance variables in class 
+
+class SampleClassVaribleDemo
+    @v1 = 100
+    @v2 = 200
+
+    def get_user
+     puts @v1
+     puts @v2
+    end
+
+    def self.get_user_v1
+     puts @v1
+     puts @v2
+    end
+  end
+
+@scv = SampleClassVaribleDemo.new
+@scv.get_user
+SampleClassVaribleDemo.get_user_v1
+
+## attr_accessors , attr_reader , attr_writer
+
+#create a class with attributes first_name,last_name and country
+
+
+class User
+   #attr_reader :first_name,:last_name,:country
+   #attr_writer :first_name,:last_name,:country
+   attr_accessor :first_name,:last_name,:country
+  def initialize(first_name,last_name,country)
+    @first_name = first_name
+    @last_name = last_name
+    @country = country
+  end
+  
+  def full_name
+    @first_name + "  " + @last_name
+  end
+end
+
+@user = User.new("satish","Tandu","india")
+@user = User.new("satish1","Tandu1","india")
+@user = User.new("satish2","Tandu2","india")
+@user = User.new("satish3","Tandu3","india")
+@user.first_name
+
+
+
+What are modules
+what is the difference between module and class
+1. classes are defined with keyword called class and modules are defined with a keyword called module
+2. classes can be instanciated but modules cant be instanciated
+3. whenever we create a new class in ruby it will instanciates the Class class and this newly created class can be instanciated again
+4. whenever we create a new module in ruby it will instanciates Module class in ruby this new created module cant be instanciated
+5. classes can be inherited but modules cant be inherited
+6. modules can be either included or extended inside a class
+ 
+what are mixins
+what is mokey patching
+what is the difference include and extend
+what is preload
+
+what are Module::
+
+1.modules are collection of classes,methods , constants and other modules
+
+2. modules are created with a keyword called module
+3. modules can acts as namespace
+   ex::
+
+    module Abc
+      class A
+        def sample
+         puts "sample"
+        end
+        def A.sample1
+         puts "sample self"
+        end
+      end
+    end
+  # accesiing class inside a module
+
+   @s1 = Abc::A.new
+
+2.5.0 :011 > @s1 = Abc::A.new
+ => #<Abc::A:0x09dcdb98> 
+2.5.0 :012 > 
+2.5.0 :013 > 
+2.5.0 :014 > @s1.sample
+sample
+ => nil 
+2.5.0 :015 > 
+2.5.0 :016 > 
+2.5.0 :017 > Abc::A.sample1
+sample self
+ => nil 
+2.5.0 :018 > 
+
+## including and extending of a module in class
+
+
+#class A  100methods
+
+#class B  100methods
+
+#class A and class B are having 40 common methods we put these common methods in a module
+
+
+module A
+  def sample1
+    puts "this is from module A"
+  end
+end
+
+module B
+  def sample2
+    puts "this is from Module B"
+  end
+end
+module C
+  def sample3
+    puts "this is from module C"
+  end
+end
+module D
+  def sample4
+    puts "this is from module D"
+  end
+end
+
+class ModuleDemo
+ include A
+ include C
+ extend B
+ extend D
+end
+
+@md = ModuleDemo.new
+@md.sample1
+ModuleDemo.sample2
+
+if method with same name defined inside class and module which one be called?
+
+module A
+  def sample
+    puts "from module A"
+  end
+end
+
+module AB
+ def ab
+  puts "ab"
+ end
+end
+
+class B  
+  include A
+  include AB
+  def sample 
+   puts "from class B"
+  end
+end
+
+class C
+ include A
+ extend AB
+end
+
+
+@b = B.new 
+@b.sample
+
+
+What are mixins in ruby?
+
+Inheritance In Ruby ::
+ getting parent properties (class features) into childs (sub class) is called as inheritance
+ 
+inheritace is classified as follows
+ 1. single inhgeritance
+ 2. multiple inheritance { does not supported by ruby directly but we can acieve same functionalty using a conecpt called mixins}
+ 3. multi level inheritance { does not supported by ruby because in ruby one class at a time can inherit from one class only }
+
+what are the mixins::
+
+   one class can include multiple modules at a time similarly one module can be included into many classes this concept called as mixins 
+
+
+ex::
+
+ class SuperC
+  def a1
+   puts "a1"
+  end
+ end
+
+class SubC < SuperC
+
+end
+
+@abc = SubC class SuperC
+  def a1
+   puts "a1"
+  end
+ end
+
+class SubC < SuperC
+
+end
+
+@abc = Subc.new
+@abc.a1
+.new
+@abc.a1
+
+
+
+What is metaprogramming::
+  act of writing code which operates on code istead of operating on data is called as meta programming.
+
+ex::
+
+instance_eval
+class-eval
+
+ rails :: partials
+          scaffolding
+          creating a migration conecept
+
+1. class_eval and instance_eval both are used add methods dynamically
+
+ex::
+
+class MyClass
+  def initialize(num)
+    @num = num
+  end
+end
+
+a = MyClass.new(1)
+b = MyClass.new(2) 
+
+##  instance_eval 
+a.num #error
+b.num #error
+
+1.instance_eval is used to call instance variables and private methods
+# sytax is   object.instance_eval {inastance_variable/private_method}
+a.instance_eval { @num }
+b.instance_eval { @num }
+2. instance_eval is used to define singleton methods
+   singleton methods: methods specific object are called as singleton methods
+  a.instance_eval do
+   def sample
+     puts "sample"
+   end
+   def sample1
+     puts "sample1"
+   end
+  end
+
+a.sample
+a.sample1
+b.sample #error
+b.sample1 #error
+
+3. defing a self methods to class
+
+  MyClass.instance_eval do
+    def sample_self
+      puts "this self method is created using instance eval"
+    end
+  end
+
+
+class_eval::
+
+1. it is used to add instance methods to class
+
+ #sytax::  
+
+MyClass.class_eval do
+  def sample_class_eval_demo
+   puts "sample class eval demo"
+  end
+end
+ 
+
+
+
+Access Specifiers::
+1. what are different types of access specifiers in ruby
+   In ruby there are three types of access specifiers are there those are public private and protected
+    
+2. waht are access specifiers
+   access specifiers are used to manage the accesing scope of methods
+3. class can have 2 types of methods those are self and instance methods, we cant apply access specifiers on self methods only we 
+   can apply on instance methods
+
+class A
+  def sample   # this is public method
+    puts "sample"
+  end
+  private
+  def sample1
+    puts "sample1 is a private method"
+  end
+  def sample2
+    puts "sample2 is a private method"
+  end
+  protected
+  def sample3
+    puts "sample3 is a protectd method"
+  end
+end 
+
+
+@a = A.new
+
+@a.sample 
+@a.sample1 #error becase private and protected methods cant be called from outside of a class
+@a.sample2 # ""
+@a.sample3 # ""
+
+###How to call private methods of a class

@@ -1,0 +1,76 @@
+lambda, proc, block,Proc.new::
+
+ 1. in ruby blocks are not objects
+ 2. we can convert blocks into callable objects by using procs and lambdas
+ 3. procks,lambdas and blocks are called as clousers
+ 4. clousers::  are objects which are having access to local variables in which they have called.
+    ex:: if they have called in method they can be access the local variables in the corresponding method
+
+LAMBDA::
+ex::
+ lamda without aruments:
+
+    @lamda_sample = lambda{puts "sample lambda";puts "another statement"}
+    @lamda_sample.call
+
+ lamda with arguments::
+    @lamda_sample = lambda{|i| puts i*100}
+      @lamda_sample.call(10)
+    @lamda_sample = lambda{|i,j| puts i*j}
+      @lamda_sample.call(10,20)
+
+
+2. in ruby 1.8.x lambda== proc(spell it like lower case proc) and in ruby 1.9.x Proc.new == proc
+3. lambda will have a method like behaviour i.e if you pass missing number of arguments to lambda it will raises Argument error where as
+   proc will have a block like behaviour I we pass missing number of arguments to proc it will ignores them.
+4.return statement inside lambda will return from lambda block rest of the code inside method will be executed but return statement inside
+  proc will come out of the proc block and also it will come out of method in which it is defined.
+
+
+PROCS::
+
+  ex::
+   proc without aruments:
+
+    @proc_sample = Proc.new {puts "sample lambda";puts "another statement"}
+    @proc_sample.call
+
+ proc with arguments::
+    @proc_sample = Proc.new {|i| puts i*100}
+      @proc_sample.call(10)
+    @proc_sample = Proc.new {|i,j| puts i*j}
+      @proc_sample.call(10,20)
+
+ 1. procs are instances of Proc class
+ 2. procs will behave like a block i.e if you pass missing number arguments it will ignores
+
+
+return statement inside proc and lambda::
+
+def lambda_test
+  lam = lambda { return }
+  lam.call
+  puts "Hello world"
+end
+
+lambda_test  
+
+
+def proc_test
+  proc = Proc.new { return }
+  proc.call
+  puts "Hello world"
+end
+
+proc_test  
+
+def proc_test
+  proc = Proc.new { return }
+  proc.call
+  puts "Hello world"
+end
+
+proc_test
+1. lambda is method defined inside module class
+
+

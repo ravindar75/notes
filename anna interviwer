@@ -1,0 +1,136 @@
+==> what is assoications?
+	In Rails, an association is a connection between two Active Record models
+==>Why do we need associations between models?
+	Because they make common operations simpler and easier in your code
+==> The belongs_to Association
+	A belongs_to association sets up a one-to-one connection with another model
+==>  The has_many Association
+	A has_many association indicates a one-to-many connection with another model.
+==>  A has_many :through association is often used to set up a many-to-many connection with another model.
+==> A has_one :through association sets up a one-to-one connection with another mode
+==> A has_and_belongs_to_many association creates a direct many-to-many connection with another model, with no intervening model
+	
+==> object life cycle
+	1. validate
+	2. saved(save , create)
+	3. commit(transactional callbacks)
+==> what is callback?
+	1. blocks of code which used to execute during changing of life cycle of object
+
+
+   Class.superclass 
+       => Module 
+   Class.superclass.superclass
+       => Object (1.8.x)
+   Class.superclass.superclass.superclass
+       => BasicObject (> 1.9.x)
+   Class.superclass.superclass.superclass.superclass
+       => nil 
+
+==> class:: 
+
+	1. class is a blue print for creating objects
+	2. class is instance of Class in ruby whenever we create new class it will instanciates Class class in ruby
+	3. In ruby there will be class hierarchy and in this hierarchy either BasicObject or Object class is the top most class based on
+  	 version of ruby,in ruby 1.8.x Object is the top most class and from 1.9.x onwards BasicObject is the top most class in ruby
+
+==> what is constructor in ruby?  
+	in Ruby initialixe method will acts as constructor
+==> what is the difference between instance methods and self methods?
+    	1. to call instance methods in class we need to create a object for class
+    	2. self method will called on class itself no need to create object  i.e ClassName.methodname
+==> What is the attr_accesors?
+
+==>what are Module::
+
+	1.modules are collection of classes,methods,constants and other modules
+	2.modules are created with a keyword called module
+	3.modules can acts as namespace
+==> what is the difference between module and class
+	1. classes are defined with keyword called class and modules are defined with a keyword called module
+	2. classes can be instanciated but modules cant be instanciated
+	. whenever we create a new class in ruby it will instanciates the Class class and this newly created class can be instanciated again
+	4. whenever we create a new module in ruby it will instanciates Module class in ruby this new created module cant be instanciated
+	5. classes can be inherited but modules cant be inherited
+	6. modules can be either included or extended inside a class
+
+==> Inheritance In Ruby ::
+        getting parent properties (class features) into childs (sub class) is called as inheritance
+==> inheritace is classified as follows
+ 	1. single inhgeritance
+ 	2. multiple inheritance { does not supported by ruby directly but we can acieve same functionalty using a conecpt called mixins}
+ 	3. multi level inheritance { does not supported by ruby because in ruby one class at a time can inherit from one class only }
+
+==>what are the mixins::
+   	one class can include multiple modules at a time similarly one module can be included into many classes this concept called as mixins
+==>What is metaprogramming::
+  	act of writing code which operates on code istead of operating on data is called as meta programming.
+==>instance_eval class-eval?
+	1. class_eval and instance_eval both are used add methods dynamically	
+	1.instance_eval is used to call instance variables and private methods
+	2. instance_eval is used to define singleton methods
+	3.defing a self methods to class
+	class_eval
+	1.it is used to add instance methods to class
+
+==> Access Specifiers::
+	1. what are different types of access specifiers in ruby.
+   		In ruby there are three types of access specifiers are there those are public private and protected    
+	2. waht are access specifiers.
+  		 access specifiers are used to manage the accesing scope of methods.
+	3. class can have 2 types of methods those are self and instance methods, we cant apply access specifiers on self methods only we 
+ 		  can apply on instance methods.
+==> lambda, proc, block,Proc.new::
+
+ 	1. in ruby blocks are not objects
+ 	2. we can convert blocks into callable objects by using procs and lambdas
+ 	3. procks,lambdas and blocks are called as clousers
+ 	4. clousers::  are objects which are having access to local variables in which they have called.
+   	ex:: if they have called in method they can be access the local variables in the corresponding method
+==>  2. in ruby 1.8.x lambda== proc(spell it like lower case proc) and in ruby 1.9.x Proc.new == proc
+     3. lambda will have a method like behaviour i.e if you pass missing number of arguments to lambda it will raises Argument error where as
+        proc will have a block like behaviour I we pass missing number of arguments to proc it will ignores them.
+     4.return statement inside lambda will return from lambda block rest of the code inside method will be executed but return statement inside
+        proc will come out of the proc block and also it will come out of method in which it is defined.
+
+==> 1. procs are instances of Proc class
+    2. procs will behave like a block i.e if you pass missing number arguments it will ignores
+==>2. in ruby 1.8.x lambda== proc(spell it like lower case proc) and in ruby 1.9.x Proc.new == proc
+   3. lambda will have a method like behaviour i.e if you pass missing number of arguments to lambda it will raises Argument error where as
+      proc will have a block like behaviour I we pass missing number of arguments to proc it will ignores them.
+  4.return statement inside lambda will return from lambda block rest of the code inside method will be executed but return statement inside
+      proc will come out of the proc block and also it will come out of method in which it is defined.
+==> what is method?
+    method is collection of statements
+==>  what is interpolation?
+	within in a string print varailbles 
+==> what is the meaning of * in arguments
+	if * is there in arguments its will accepts array as a argument
+==> what is meaning of & oparator in arguments 
+	it will accepts block  as argument 
+==> waht is block ?
+	block is collection of statements
+	blocks are not objects in ruby
+	blocks can be defined using {} or do end 
+==> yield : in ruby yield is used to invoke block
+	    in rails yield is used invoke template
+    	
+==> What is metaprogramming::
+  act of writing code which operates on code istead of operating on data is called as meta programming.
+==> 1. class_eval and instance_eval both are used add methods dynamically
+==> 2. 1.instance_eval is used to call instance variables and private methods
+==> 2. instance_eval is used to define singleton methods
+   singleton methods: methods specific object are called as singleton methods
+	3. defing a self methods to class
+	4. it is used to add instance methods to class
+==>Access Specifiers::
+	1. what are different types of access specifiers in ruby
+   		In ruby there are three types of access specifiers are there those are public private and protected
+    	2. waht are access specifiers
+   		access specifiers are used to manage the accesing scope of methods
+	3. class can have 2 types of methods those are self and instance methods, we cant apply access specifiers on self methods only we 
+   		can apply on instance methods
+	
+
+
+
