@@ -1,0 +1,194 @@
+In ruby we have 3 types access specifiers
+1.public(default)
+2.private
+3.protected
+
+access specifiers are used to control the access of methods
+
+class A 
+
+end
+
+class B < A
+
+end
+
+A --> super class
+B --> sub class
+
+1. In ruby behaiour of private protected  methods is different form other programming languages.
+  a. in other programming languages if we define a private and protected methods in super class wont be accessed in sub class
+  b. In ruby if we define a private and protected classes in super class they can be accessed in sub class
+2. basic usage of private and protected methods is calling them public methods
+
+
+ class A
+
+  def sample1
+    sample3
+  end
+
+  def sample 2
+   sample4
+  end
+
+  private
+   def sample3
+     puts "this is from sample3 private method"
+   end
+  
+  protected
+   def sample4
+    puts "this is from sample4 private method"
+   end
+end
+
+Difference between private and protected::
+
+Private:
+
+1.private methods cant be called with an explicit receiver(using self inside subclass).
+2.Private methods should allways called with an implicit receiver
+
+protected:
+1. protected can be  called with both implicit and explicit receivers
+
+explanation: suppose lets take we have a private method defined inside super class and its called using self inside subclass its wont work 
+but incase of protected method it will work.
+
+class Foo
+ 
+  def bar
+    method1
+  end
+ 
+  private
+ 
+  def method1
+    puts "Hi this is a private method"
+  end 
+end
+
+
+Class Blah < Foo
+
+ def main_method
+  method1
+ end
+end
+
+
+@f1 = Foo.new
+@f1.bar
+@b1 =  Blah.new
+@b1.main_method
+
+
+
+
+
+class Foo
+
+  def bar
+    method1
+  end
+ 
+  private
+ 
+  def method1
+    puts "Hi this is a private method"
+  end
+end
+
+
+Class Blah < Foo
+
+ def main_method
+  self.method1
+ end
+end
+
+@f1 = Foo.new
+@f1.bar
+@b1 =  Blah.new
+@b1.main_method  # this will give error
+
+
+
+
+protected::
+
+
+class Foo
+ 
+  def bar
+    method1
+  end
+ 
+  protected
+ 
+  def method1
+    puts "Hi this is a private method"
+  end
+end
+
+
+Class Blah < Foo
+
+ def main_method
+  method1
+ end
+end
+
+
+@f1 = Foo.new
+@f1.bar
+@b1 =  Blah.new
+@b1.main_method
+
+
+
+class Foo
+ 
+  def bar
+    method1
+  end
+ 
+  private
+ 
+  def method1
+    puts "Hi this is a private method"
+  end
+end
+
+
+Class Blah < Foo
+
+ def main_method
+  self.method1
+ end
+end
+
+
+@f1 = Foo.new
+@f1.bar
+@b1 =  Blah.new
+@b1.main_method
+
+
+Getting Componets of date time
+
+time = Time.new
+
+# Components of a Time
+puts "Current Time : " + time.inspect
+puts time.year    # => Year of the date 
+puts time.month   # => Month of the date (1 to 12)
+puts time.day     # => Day of the date (1 to 31 )
+puts time.wday    # => 0: Day of week: 0 is Sunday
+puts time.yday    # => 365: Day of year
+puts time.hour    # => 23: 24-hour clock
+puts time.min     # => 59
+puts time.sec     # => 59
+puts time.usec    # => 999999: microseconds
+puts time.zone    # => "UTC": timezone name

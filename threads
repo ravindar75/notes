@@ -1,0 +1,35 @@
+What is a thread::
+
+ A thread of execution is a sequence of Ruby statements that run (or appear to run) in parallel with the main sequence
+ of statements that the interpreter is running.
+
+whether ruby supports multihtreading 
+
+  yes ruby supports mutlithreading using a Thread class
+
+How to create a thread in ruby
+ 1. by instanciating Thread class we can create a thread in ruby
+
+
+def func1
+   i = 0
+   while i<=2
+      puts "func1 at: #{Time.now}"
+      sleep(2)
+      i = i+1
+   end
+end
+
+def func2
+   j = 0
+   while j<=2
+      puts "func2 at: #{Time.now}"
+      sleep(1)
+      j = j+1
+   end
+end
+
+t1 = Thread.new{func1()}
+t2 = Thread.new{func2()}
+t1.join # t1.start
+t2.join # t1.start

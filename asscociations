@@ -1,0 +1,166 @@
+
+Associations::
+ 1. associations are used to join tables in rails
+
+
+1. one to one associations
+2. one to many associations
+3. many to many associations
+4. polymorphic associations
+5. single table inheritance(STI)
+6. self joins
+
+In other Way
+
+The Types of Associations
+Rails supports six types of associations:
+
+belongs_to
+has_one
+has_many
+has_many :through
+has_one :through
+has_and_belongs_to_many
+polymorphic
+STI
+Self Joins
+
+One to One associations(what is the difference between has_one and belongs_to)
+Foreign Key::  singular_table_name_id is the foreign key
+
+1. belongs_to
+2. has_one
+
+belongs_to::
+
+class Book < ApplicationRecord
+  belongs_to :author
+end
+
+class Author < ApplicationRecord
+  
+end
+Author.create(name:"author1")
+Author.create(name:"author2")
+Author.create(name:"author3")
+Author.create(name:"author4")
+Book.create(name:"boook1",author_id:1)
+Book.create(name:"boook2",author_id:2)
+Book.create(name:"boook3",author_id:3)
+Book.create(name:"boook4",author_id:4)
+Book.create(name:"boook5",author_id:1)
+Book.create(name:"boook6",author_id:2)
+Book.create(name:"boook7",author_id:3)
+Book.create(name:"boook8",author_id:4)
+
+
+
+@book = Book.find(1)
+@book.author
+@book.author.name
+@book.author.id
+@book.author.created_at
+
+#  we are assigning author with id =3 to book with id=1
+@book = Book.find(1)
+@author = Author.find(3)
+@book.author = @author
+
+class Author < ApplicationRecord
+ has_one :book
+end
+
+@author = Author.find(1)
+@author.book
+@author.book.name
+
+
+has_one::
+
+class Supplier < ApplicationRecord
+  has_one :account
+end
+
+
+class Account < ApplicationRecord
+  
+end
+
+Supplier.create(name:"supplier1")
+Supplier.create(name:"supplier2")
+Supplier.create(name:"supplier3")
+Supplier.create(name:"supplier4")
+
+Account.create(account_number:123,supplier_id:1)
+Account.create(account_number:456,supplier_id:2)
+Account.create(account_number:789,supplier_id:3)
+Account.create(account_number:012,supplier_id:4)
+
+@supplier = Supplier.first
+@supplier.account
+
+class Account < ApplicationRecord
+  belongs_to :supplier  
+end
+
+@account = Account.find(1)
+@account.supplier
+
+The has_many Association
+A has_many association indicates a one-to-many connection with another model.
+You'll often find this association on the "other side" of a belongs_to association.
+
+class Author < ApplicationRecord
+ has_many :books
+end
+
+Book.destroy_all
+Author.destroy_all
+
+Author.create(name:"author1")
+Author.create(name:"author2")
+Author.create(name:"author3")
+Author.create(name:"author4")
+Book.create(name:"boook1",author_id:4)
+Book.create(name:"boook2",author_id:5)
+Book.create(name:"boook3",author_id:6)
+Book.create(name:"boook4",author_id:7)
+Book.create(name:"boook5",author_id:4)
+Book.create(name:"boook6",author_id:5)
+Book.create(name:"boook7",author_id:6)
+Book.create(name:"boook8",author_id:7)
+
+
+ @author = Author.find(4)
+To get books of author
+
+ @author.books
+
+adding book to author
+@author.books << Book.create(name:"book100")
+@author.books.create(name:"book101")
+
+Many To Many Associations::
+
+1. has_and_beongs_to_many
+2. has_many :through Association
+
+
+has_many :through Association ::
+
+
+class Physician < ApplicationRecord
+  has_many :appointments
+  has_many :patients, through: :appointments
+end
+ 
+class Appointment < ApplicationRecord
+  belongs_to :physician
+  belongs_to :patient
+end
+ 
+class Patient < ApplicationRecord
+  has_many :appointments
+  has_many :physicians, through: :appointments
+end
+

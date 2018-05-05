@@ -1,0 +1,379 @@
+
+Associations::
+ 1. associations are used to join tables in rails
+
+
+1. one to one associations
+2. one to many associations
+3. many to many associations
+4. polymorphic associations
+5. single table inheritance(STI)
+6. self joins
+
+In other Way
+
+The Types of Associations
+Rails supports six types of associations:
+
+belongs_to
+has_one
+has_many
+has_many :through
+has_one :through
+has_and_belongs_to_many
+polymorphic
+STI
+Self Joins
+
+One to One associations(what is the difference between has_one and belongs_to)
+Foreign Key::  singular_table_name_id is the foreign key
+
+1. belongs_to
+2. has_one
+
+belongs_to::
+
+class Book < ApplicationRecord
+  belongs_to :author
+end
+
+class Author < ApplicationRecord
+  
+end
+Author.create(name:"author1")
+Author.create(name:"author2")
+Author.create(name:"author3")
+Author.create(name:"author4")
+Book.create(name:"boook1",author_id:1)
+Book.create(name:"boook2",author_id:2)
+Book.create(name:"boook3",author_id:3)
+Book.create(name:"boook4",author_id:4)
+Book.create(name:"boook5",author_id:1)
+Book.create(name:"boook6",author_id:2)
+Book.create(name:"boook7",author_id:3)
+Book.create(name:"boook8",author_id:4)
+
+
+
+@book = Book.find(1)
+@book.author
+@book.author.name
+@book.author.id
+@book.author.created_at
+
+#  we are assigning author with id =3 to book with id=1
+@book = Book.find(1)
+@author = Author.find(3)
+@book.author = @author
+
+class Author < ApplicationRecord
+ has_one :book
+end
+
+@author = Author.find(1)
+@author.book
+@author.book.name
+
+
+has_one::
+
+class Supplier < ApplicationRecord
+  has_one :account
+end
+
+
+class Account < ApplicationRecord
+  
+end
+
+Supplier.create(name:"supplier1")
+Supplier.create(name:"supplier2")
+Supplier.create(name:"supplier3")
+Supplier.create(name:"supplier4")
+
+Account.create(account_number:123,supplier_id:1)
+Account.create(account_number:456,supplier_id:2)
+Account.create(account_number:789,supplier_id:3)
+Account.create(account_number:012,supplier_id:4)
+
+@supplier = Supplier.first
+@supplier.account
+
+class Account < ApplicationRecord
+  belongs_to :supplier  
+end
+
+@account = Account.find(1)
+@account.supplier
+
+The has_many Association
+A has_many association indicates a one-to-many connection with another model.
+You'll often find this association on the "other side" of a belongs_to association.
+
+class Author < ApplicationRecord
+ has_many :books
+end
+
+Book.destroy_all
+Author.destroy_all
+
+Author.create(name:"author1")
+Author.create(name:"author2")
+Author.create(name:"author3")
+Author.create(name:"author4")
+Book.create(name:"boook1",author_id:4)
+Book.create(name:"boook2",author_id:5)
+Book.create(name:"boook3",author_id:6)
+Book.create(name:"boook4",author_id:7)
+Book.create(name:"boook5",author_id:4)
+Book.create(name:"boook6",author_id:5)
+Book.create(name:"boook7",author_id:6)
+Book.create(name:"boook8",author_id:7)
+
+
+ @author = Author.find(4)
+To get books of author
+
+ @author.books
+
+adding book to author
+@author.books << Book.create(name:"book100")
+@author.books.create(name:"book101")
+
+Many To Many Associations::
+
+1. has_and_beongs_to_many
+2. has_many :through Association
+
+
+has_many :through Association ::
+
+
+class Physician < ApplicationRecord
+  has_many :appointments
+  has_many :patients, through: :appointments
+end
+ 
+class Appointment < ApplicationRecord
+  belongs_to :physician
+  belongs_to :patient
+end
+ 
+class Patient < ApplicationRecord
+  has_many :appointments
+  has_many :physicians, through: :appointments
+end
+
+
+
+Physician.create(name:"physician1")
+Physician.create(name:"physician2")
+Physician.create(name:"physician3")
+Physician.create(name:"physician4")
+Physician.create(name:"physician5")
+
+Patient.create(name:"patient1")
+Patient.create(name:"patient2")
+Patient.create(name:"patient3")
+Patient.create(name:"patient4")
+Patient.create(name:"patient5")
+
+@patient = patient.find(1)
+@patient.physicians
+@patient.physicians.count
+@patient.physicians.create(name:"patient100")
+@patient.physicians
+@patient.physicians.count
+
+@physician =  Physician.find(1)
+@physician.patients
+@physician.patients.count
+@physician.patients.create(name:"patient100")
+@physician.patients
+@physician.patients.count
+
+
+The has_and_belongs_to_many Association::
+
+1. three tables and 2 models
+2. one table will acts as joining table and it wont have id column and its wont have model it will acts as a lookuptable with
+   2 foreign keys each one from one table
+3. naming conevtions for joining table is first_table_second_table if I order tabe names in albetical order
+4. in has_many through joining table will have model and we can place callbacks,validations also in that model
+4. in has_many through in joining table we can put extra columns other than 2 foreign keys from each table
+
+
+
+class Assembly < ApplicationRecord
+  has_and_belongs_to_many :parts
+end
+ 
+class Part < ApplicationRecord
+  has_and_belongs_to_many :assemblies
+end
+
+
+ rails g scaffold part part_number:string
+ rails g scaffold aeesmbly name:string
+ rails g migration create_assemblies_parts assembly_id:integer part_id:integer
+
+ class CreateAssembliesParts < ActiveRecord::Migration[5.1]
+  def change
+    create_table :assemblies_parts, id: false do |t|
+      t.integer :assembly_id
+      t.integer :part_id
+    end
+  end
+end
+
+
+
+ # create a rake task for seeding data 
+  1. rake is  similar to make utility in Linux
+  2. rake tasks will present in lib/tasks/
+  3. extension of take task is .rake
+  
+  sample code of rake task as follows
+
+  rails g task seed_data assemblies parts authors books suppliers accounts physicians patients
+
+
+namespace :seed_data do
+
+  desc "creates sample records in assemblies table"
+  task assemblies: :environment do
+   Assembly.create(name:"assembly1")
+   Assembly.create(name:"assembly2")
+   Assembly.create(name:"assembly3")
+   Assembly.create(name:"assembly4")
+   Assembly.create(name:"assembly5")
+  end
+
+  desc "create sample records in parts table"
+  task parts: :environment do
+   Part.create(part_number: "partnumber1")
+   Part.create(part_number: "partnumber2")
+   Part.create(part_number: "partnumber3")
+   Part.create(part_number: "partnumber4")
+   Part.create(part_number: "partnumber5")
+  end
+
+  desc "create authors dynamically"
+  task authors: :environment do
+    100.times do |i|
+     Author.create(name:"name#{i}")
+    end
+  end
+
+end
+
+
+@part = Part.find(1)
+@part.assemblies
+@part.assemblies.create(name:"assembly6")
+@part.assemblies.create(name:"assembly7")
+@part.assemblies
+
+@assembly = Assembly.find(1)
+@assembly.parts
+@assembly.parts.create(part_number:"part6")
+@assembly.parts.create(part_number:"part7")
+@assembly.parts
+
+
+
+Polymorphic Accociations::
+
+
+todo.each_with_index do |item, index| 
+  puts "#{index + 1}. #{item}"
+ end 
+
+
+todo.each_with_index { |item, index|  puts "#{index + 1}. #{item}" }
+
+we 4 tables and are haing 10 common columns , we will move common columns to another model and we will make it polymorphic and we will 
+associate that polymorphic model with 4 models(table)
+
+class Picture < ApplicationRecord
+  belongs_to :imageable, polymorphic: true
+end
+ 
+class Employee < ApplicationRecord
+  has_many :pictures, as: :imageable
+end
+ 
+class Product < ApplicationRecord
+  has_many :pictures, as: :imageable
+end
+
+
+
+rails g scaffold employee name:string
+rails g scaffold product name:string
+rails g scaffold picture name:sting imageable_id:integer imageable_type:string
+
+
+2.5.0 :097 > Sport
+ => Sport(id: integer, name: string, players: string, teamsize: string, type: string, created_at: datetime, updated_at: datetime) 
+2.5.0 :098 > 
+2.5.0 :099 > Baseball
+ => Baseball(id: integer, name: string, players: string, teamsize: string, type: string, created_at: datetime, updated_at: datetime) 
+2.5.0 :100 > ProFootball
+ => ProFootball(id: integer, name: string, players: string, teamsize: string, type: string, created_at: datetime, updated_at: datetime) 
+2.5.0 :101 > ProBasketball
+ => ProBasketball(id: integer, name: string, players: string, teamsize: string, type: string, created_at: datetime, updated_at: datetime) 
+2.5.0 :102 > 
+2.5.0 :103 > 
+2.5.0 :104 > Sport.count
+   (35.5ms)  SELECT COUNT(*) FROM `sports`
+ => 0 
+2.5.0 :105 > Sport.create(name:"spot1")
+   (0.3ms)  BEGIN
+  SQL (100.8ms)  INSERT INTO `sports` (`name`, `created_at`, `updated_at`) VALUES ('spot1', '2018-05-04 17:59:42', '2018-05-04 17:59:42')
+   (102.8ms)  COMMIT
+ => #<Sport id: 1, name: "spot1", players: nil, teamsize: nil, type: nil, created_at: "2018-05-04 17:59:42", updated_at: "2018-05-04 17:59:42"> 
+2.5.0 :106 > Sport.all
+  Sport Load (0.7ms)  SELECT  `sports`.* FROM `sports` LIMIT 11
+ => #<ActiveRecord::Relation [#<Sport id: 1, name: "spot1", players: nil, teamsize: nil, type: nil, created_at: "2018-05-04 17:59:42", updated_at: "2018-05-04 17:59:42">]> 
+2.5.0 :107 > Baseball.create(name:"spot2")
+   (0.4ms)  BEGIN
+  SQL (0.9ms)  INSERT INTO `sports` (`name`, `type`, `created_at`, `updated_at`) VALUES ('spot2', 'Baseball', '2018-05-04 18:00:47', '2018-05-04 18:00:47')
+   (166.2ms)  COMMIT
+ => #<Baseball id: 2, name: "spot2", players: nil, teamsize: nil, type: "Baseball", created_at: "2018-05-04 18:00:47", updated_at: "2018-05-04 18:00:47"> 
+2.5.0 :108 > Sport.all
+  Sport Load (0.7ms)  SELECT  `sports`.* FROM `sports` LIMIT 11
+ => #<ActiveRecord::Relation [#<Sport id: 1, name: "spot1", players: nil, teamsize: nil, type: nil, created_at: "2018-05-04 17:59:42", updated_at: "2018-05-04 17:59:42">, #<Baseball id: 2, name: "spot2", players: nil, teamsize: nil, type: "Baseball", created_at: "2018-05-04 18:00:47", updated_at: "2018-05-04 18:00:47">]> 
+2.5.0 :109 > ProFootball.create(name:"spot3")
+   (3.3ms)  BEGIN
+  SQL (0.7ms)  INSERT INTO `sports` (`name`, `type`, `created_at`, `updated_at`) VALUES ('spot3', 'ProFootball', '2018-05-04 18:01:27', '2018-05-04 18:01:27')
+   (32.7ms)  COMMIT
+ => #<ProFootball id: 3, name: "spot3", players: nil, teamsize: nil, type: "ProFootball", created_at: "2018-05-04 18:01:27", updated_at: "2018-05-04 18:01:27"> 
+2.5.0 :110 > 
+2.5.0 :111 > 
+2.5.0 :112 > ProBasketball.create(name:"spot3")
+   (0.3ms)  BEGIN
+  SQL (1.4ms)  INSERT INTO `sports` (`name`, `type`, `created_at`, `updated_at`) VALUES ('spot3', 'ProBasketball', '2018-05-04 18:01:36', '2018-05-04 18:01:36')
+   (78.2ms)  COMMIT
+ => #<ProBasketball id: 4, name: "spot3", players: nil, teamsize: nil, type: "ProBasketball", created_at: "2018-05-04 18:01:36", updated_at: "2018-05-04 18:01:36"> 
+2.5.0 :113 > 
+2.5.0 :114 > 
+2.5.0 :115 > Sport.all
+  Sport Load (0.7ms)  SELECT  `sports`.* FROM `sports` LIMIT 11
+ => #<ActiveRecord::Relation [#<Sport id: 1, name: "spot1", players: nil, teamsize: nil, type: nil, created_at: "2018-05-04 17:59:42", updated_at: "2018-05-04 17:59:42">, #<Baseball id: 2, name: "spot2", players: nil, teamsize: nil, type: "Baseball", created_at: "2018-05-04 18:00:47", updated_at: "2018-05-04 18:00:47">, #<ProFootball id: 3, name: "spot3", players: nil, teamsize: nil, type: "ProFootball", created_at: "2018-05-04 18:01:27", updated_at: "2018-05-04 18:01:27">, #<ProBasketball id: 4, name: "spot3", players: nil, teamsize: nil, type: "ProBasketball", created_at: "2018-05-04 18:01:36", updated_at: "2018-05-04 18:01:36">]> 
+2.5.0 :116 > 
+2.5.0 :117 > 
+2.5.0 :118 > 
+2.5.0 :119 > ProBasketball.all
+  ProBasketball Load (18.9ms)  SELECT  `sports`.* FROM `sports` WHERE `sports`.`type` IN ('ProBasketball') LIMIT 11
+ => #<ActiveRecord::Relation [#<ProBasketball id: 4, name: "spot3", players: nil, teamsize: nil, type: "ProBasketball", created_at: "2018-05-04 18:01:36", updated_at: "2018-05-04 18:01:36">]> 
+2.5.0 :120 > ProFootball.all
+  ProFootball Load (0.9ms)  SELECT  `sports`.* FROM `sports` WHERE `sports`.`type` IN ('ProFootball') LIMIT 11
+ => #<ActiveRecord::Relation [#<ProFootball id: 3, name: "spot3", players: nil, teamsize: nil, type: "ProFootball", created_at: "2018-05-04 18:01:27", updated_at: "2018-05-04 18:01:27">]> 
+2.5.0 :121 > Baseball.all
+  Baseball Load (0.7ms)  SELECT  `sports`.* FROM `sports` WHERE `sports`.`type` IN ('Baseball') LIMIT 11
+ => #<ActiveRecord::Relation [#<Baseball id: 2, name: "spot2", players: nil, teamsize: nil, type: "Baseball", created_at: "2018-05-04 18:00:47", updated_at: "2018-05-04 18:00:47">]> 
+2.5.0 :122 > 
+ 
+
+

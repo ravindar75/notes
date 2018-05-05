@@ -1,0 +1,523 @@
+Retrieving Objects from the Database::
+
+  find
+  create_with
+  distinct
+  eager_load
+extending
+from
+group
+having
+includes
+joins
+left_outer_joins
+limit
+lock
+none
+offset
+order
+preload
+readonly
+references
+reorder
+reverse_order
+select
+where
+
+
+Retrieving a Single Object::
+
+1. find:
+
+  @book = Book.find(1)
+  @book1 = Book.find(2)
+  @books = Book.find([1,2,3])
+  @books = Book.find((1..5).to_a)
+  @books = Book.take
+  @books = Book.take(2)
+  @books = Book.take(3)
+  @books = Book.find(100)  #ActiveRecord::RecordNotFound 
+  @books = Book.take(100)
+
+  @books = Book.first
+  @books = Book.first(3)
+  @books = Book.last
+  @books = Book.last(3)
+
+find_by::
+
+difference between find and find_by:
+
+  find will produces ActiveRecord::RecordNotFound errod if we pass a id which does not exists
+  find_by  return nil  if matched record is not found
+    1. we can use any column in find_by
+
+  Book.find_by name: 'satish'
+  Book.find_by id: 1
+
+ Retrieving Multiple Objects in Batches::
+
+  Book.all
+  Book.all.map(&:id)
+  Book.all.map(&:phone)
+
+find_each
+
+The find_each method retrieves records in batches and then yields each one to the block.
+
+
+User.find_each do |user|
+  NewsMailer.weekly(user).deliver_now
+end
+
+
+Book.find_each do |user|
+  user.phone = "8500281438"
+  user.save(validate:false)
+end
+
+Book.all.map(&:phone)
+
+Book.where(name:"satish").find_each do |book|
+  book.phone = "9052945731"
+  book.save(validate:false)
+end
+
+Book.all.map(&:phone)
+
+:batch_size
+
+The :batch_size option allows you to specify the number of records to be retrieved in each batch,
+ before being passed individually to the block.
+
+
+Book.find_each(batch_size: 5000) do |book|
+   book.phone = "9052945731"
+   book.save(validate:false)
+end
+
+
+:start
+
+By default, records are fetched in ascending order of the primary key, which must be an integer. The :start option allows 
+you to configure the first ID of the sequence whenever the lowest ID is not the one you need
+
+
+
+Book.find_each(start: 2000) do |book|
+  book.phone = "9052945731"
+  book.save(validate:false)
+end
+
+
+:finish
+
+Similar to the :start option, :finish allows you to configure the last ID of the sequence whenever the highest ID is not the 
+one you need. This would be useful, for example, if you wanted to run a batch process using a subset of records based on :start and :finish.
+
+Book.find_each(start: 2, finish: 5) do |book|
+  book.phone = "9052945731"
+  book.save(validate:false)
+end
+
+find_in_batches::
+
+The find_in_batches method is similar to find_each, since both retrieve batches of records. 
+The difference is that find_in_batches yields batches to the block as an array of models, instead of individually.
+The following example will yield to the supplied block an array of up to 1000 invoices at a time,
+with the final block containing any remaining invoices:
+
+# Give add_invoices an array of 1000 invoices at a time.
+
+Book.find_in_batches do |books|
+  books.each do |book|
+   book.phone = "9052945731"
+   book.save(validate:false)
+  end
+end
+
+
+Conditions where::
+
+ @books = Book.where(name:"satish")
+ @books = Book.where("name = ?", params[:name])
+ @books = Book.where("name = ? AND phone = ?", params[:name], params[:phone])
+ @books = Book.where("name = #{params[:name]}")
+ @books = Book.where("name = 'satish'")
+ @books = Book.where("name is not null")  # plain sql queries
+ @books = Book.where("name is not null").count
+ @books = Book.where("created_at >= :start_date AND created_at <= :end_date",{start_date: params[:start_date], end_date: params[:end_date]})
+ @books = Book.where("id >= 5")
+ @books = Book.where("id >= 5").count
+ @books = Book.where(id: (1..5)) # using ranges in where classes
+ @books = Book.where(id: [1,3,5]) # using arrays in where classes
+ @books = Book.where.not(phone: "9052945731")
+
+Ordering
+To retrieve records from the database in a specific order, you can use the order method
+
+
+
+@books = Book.order(:created_at)
+
+@books = Book.order("created_at")
+
+@books = Book.order(created_at: :desc)
+# OR
+@books = Book.order(created_at: :asc)
+# OR
+@books = Book.order("created_at DESC")
+# OR
+@books = Book.order("created_at ASC")
+
+
+@books = Book.order(:name)
+
+@books = Book.order("name")
+
+@books = Book.order(name: :desc)
+# OR
+@books = Book.order(name: :asc)
+# OR
+@books = Book.order("name DESC")
+# OR
+@books = Book.order("name ASC")
+@books = Book.order("name ASC").order("created_at DESC")
+
+
+Selecting Specific Fields::
+
+1.By default, Model.find selects all the fields from the result set using select *.
+2.To select only a subset of fields from the result set, you can specify the subset via the select method.
+
+
+@books = Book.select("name,phone")
+@books = Book.select("name").distinct
+
+@all_books = @books.distict(false)
+
+
+Limit and Offset::
+
+1.To apply LIMIT to the SQL fired by the Model.find, you can specify the LIMIT using limit and offset methods on the relation.
+
+2.You can use limit to specify the number of records to be retrieved, and use offset to specify the number of records to skip before
+ starting to return the records
+
+@books = Book.limit(5)
+@books = Book.limit(5).offset(30)
+
+Group::
+
+1.To apply a GROUP BY clause to the SQL fired by the finder, you can use the group method.
+
+@books = Book.select("date(created_at) as ordered_date, sum(phone) as phone_sum").group("date(created_at)")
+@books = Book.select("name, sum(phone) as phome_sum").group("name")
+
+Total of grouped items::
+
+@goups_count = Book.group(:name).count
+
+Having::
+SQL uses the HAVING clause to specify conditions on the GROUP BY fields. You can add the HAVING clause to the SQL fired by the Model.
+find by adding the having method to the find.
+
+
+@books = Book.select("date(created_at) as ordered_date, sum(phone) as phone_sum").group("date(created_at)").having("sum(phone) > ?"
+,10000000000)
+
+unscope
+You can specify certain conditions to be removed using the unscope method. For example:
+
+@books = Book.where('id > 10').limit(20).order('id asc')
+
+@books_without_order = @books.unscope(:order)   # this is equal to Book.where('id > 10').limit(20)
+
+
+@books = Book.where(id: 10, name: "satish")
+@books_updated = @books.unscope(where: :id)  # this is equal to @books = Article.where(name: "satish")
+
+only::
+
+1.You can also override conditions using the only method. For example:
+2. also use to unscope multile conditions
+
+@books = Book.where('id > 10').limit(20).order('id desc').only(:order, :where)
+
+ reorder::
+
+The reorder method overrides the default scope order. 
+
+@books = Book.find(10).scope_here.reorder('name')
+
+reverse_order::
+
+1.The reverse_order method reverses the ordering clause if specified.
+
+@books = Book.where("id > 10").order(:name).reverse_order
+
+rewhere::
+
+1.The rewhere method overrides an existing, named where condition. For example:
+
+@books = Book.where(name: "satish").rewhere(phone:"8500281438")
+
+
+Null Relation::
+
+1.The none method returns a chainable relation with no records. 
+
+  @relation = Book.none
+
+Find and Where::
+
+1. find return object 
+2. where returns relation
+
+Readonly Objects::
+
+@book = Book.readonly.first
+@book.name = "asdhajsh"
+@book.save
+
+
+Locking Records for Update::
+
+1.Locking is helpful for preventing race conditions when updating records in the database and ensuring atomic updates.
+
+2.Active Record provides two locking mechanisms:
+
+Optimistic Locking
+Pessimistic Locking
+
+ Optimistic Locking
+Optimistic locking allows multiple users to access the same record for edits, and assumes a minimum of conflicts with the data.
+ It does this by checking whether another process has made changes to a record since it was opened.
+ An ActiveRecord::StaleObjectError exception is thrown if that has occurred and the update is ignored
+
+Optimistic locking column
+
+In order to use optimistic locking, the table needs to have a column called lock_version of type integer.
+
+c1 = Client.find(1)
+c2 = Client.find(1)
+ 
+c1.first_name = "Michael"
+c1.save
+ 
+c2.name = "should fail"
+c2.save # Raises an ActiveRecord::StaleObjectError
+
+
+ Pessimistic Locking
+Pessimistic locking uses a locking mechanism provided by the underlying database
+
+Item.transaction do
+  i = Item.lock.first
+  i.name = 'Jones'
+  i.save!
+end
+
+
+
+Types of joins ::
+
+Different Types of SQL JOINs
+Here are the different types of the JOINs in SQL:
+
+(INNER) JOIN: Returns records that have matching values in both tables
+LEFT (OUTER) JOIN: Return all records from the left table, and the matched records from the right table
+RIGHT (OUTER) JOIN: Return all records from the right table, and the matched records from the left table
+FULL (OUTER) JOIN: Return all records when there is a match in either left or right table
+
+
+Joining Tables
+Active Record provides two finder methods for specifying JOIN clauses on the resulting SQL: joins and left_outer_joins.
+While joins should be used for INNER JOIN or custom queries, left_outer_joins is used for queries using LEFT OUTER JOIN.
+
+
+Author.joins("INNER JOIN posts ON posts.author_id = authors.id AND posts.published = 't'")
+
+left_outer_joins
+If you want to select a set of records whether or not they have associated records you can use the left_outer_joins method.
+
+
+what is Eager Loading Associations::
+or
+what is N + 1 queries problem
+
+Eager loading is the mechanism for loading the associated records of the objects returned by Model.
+find using as few queries as possible.
+
+ ex::
+
+   each user is having many sites
+   
+LAZY LOADING::
+
+ @user = User.find(1)
+    #@user_sites = @user.sites
+    if I want print user sites in UI I need to get user from database and also i need to get iterate throush user sites and fetch site data
+    this will N+1 times the database which leads a lazy loading 
+    
+    @user.sites.each do |site|
+      puts site.name
+    end
+
+EAGER LOADING::
+   
+   @user = User.includes(:sites).find(1)
+   1.Above Query uses left_outer_join/in and fetches user sites data in a single Query which called as eager loading,its reduces number of hits to 
+   the database and improves the performance.
+   2.if there is where clause it will uses in and if there is no where clause it will uses left_outer_join
+
+
+Scopes::
+
+
+1. what are scopes
+2. what are different types of scopes
+3. what is the diffeence between scopes and self methods
+
+scope::
+1. Scoping allows you to specify commonly-used queries which can be referenced as method calls on the association objects or models
+2. scopes allways present in models
+
+Types:
+
+1.default_scope
+2.scopes with arguments
+3.scopes without arguments
+
+
+Creating a scope
+
+scopes without arguments:
+
+1. scopes are created using a keyword called scope
+
+   scope :id_greater_than_10_and_less_than_15, -> { where("id >= 10 and id <= 15") }
+
+2. scopes are allways called on Class
+
+  Employee.id_greater_than_10_and_less_than_15
+
+scopes with arguments::
+
+   scope :find_records_by_given_range, ->(lower_value,upper_value) { where("id > ? and id < ?",i,j) }
+   Employee.find_records_by_given_range(20,30)
+
+3. scopes are chainable
+    we can send output one scope as a input of another scope thats why scopes are chainable
+
+    Employee.find_records_by_given_range(10,20).id_greater_than_10_and_less_than_15
+
+Defaut Scope:
+  if i want to apply scope to all the quries automatically, we can use default scope.
+
+1. default scopes are created with a keyword called default_scope
+    default_scope { where("id > 15") }
+Removing All Scoping
+If we wish to remove scoping for any reason we can use the unscoped method.
+ This is especially useful if a default_scope is specified in the model and should not be applied for this particular query.
+
+Employee.unscoped.load
+
+Dynamic Finders::
+
+1.dynamic finders are used to find records using specific columns
+2. they used to work on concept called method misiing
+
+  method missing:: 
+
+    if a method called on object which is not defined in the class,ruby execution search that method in instance and class methods of current
+    class,methods in included or extended modules,then it will search in super class instance, self methds included extended modues methods,
+    then it will search in Class class,then it will search in Module class,then search in Object class,then it will search in 
+    BasicObject class,if its not found in above path it will execute a method called method_missing method which defined in BacisObject
+    class so this concept is called as method missing.
+
+2.5.0 :016 > @emp = Employee.find_by_name("employee0")
+  Employee Load (0.8ms)  SELECT  `employees`.* FROM `employees` WHERE `employees`.`name` = 'employee0' LIMIT 1
+ => #<Employee id: 11, name: "employee0", created_at: "2018-05-04 17:27:49", updated_at: "2018-05-04 17:27:49", manager_id: nil> 
+2.5.0 :017 > @emp = Employee.find_by_manager_id(12)
+  Employee Load (15.6ms)  SELECT  `employees`.* FROM `employees` WHERE `employees`.`manager_id` = 12 LIMIT 1
+ => #<Employee id: 21, name: "emp4", created_at: "2018-05-04 17:30:05", updated_at: "2018-05-04 17:30:05", manager_id: 12> 
+2.5.0 :018 > 
+
+
+find_or_create_by
+The find_or_create_by method checks whether a record with the specified attributes exists. If it doesn't, then create is called.
+
+2.5.0 :021 > @emp = Employee.find_or_create_by(manager_id:16)
+  Employee Load (0.9ms)  SELECT  `employees`.* FROM `employees` WHERE `employees`.`manager_id` = 16 LIMIT 1
+   (26.4ms)  BEGIN
+  Employee Load (3.7ms)  SELECT  `employees`.* FROM `employees` WHERE `employees`.`id` = 16 LIMIT 1
+  SQL (248.9ms)  INSERT INTO `employees` (`created_at`, `updated_at`, `manager_id`) VALUES ('2018-05-04 19:13:24', '2018-05-04 19:13:24', 16)
+   (196.7ms)  COMMIT
+ => #<Employee id: 26, name: nil, created_at: "2018-05-04 19:13:24", updated_at: "2018-05-04 19:13:24", manager_id: 16> 
+2.5.0 :022 > 
+2.5.0 :023 > 
+2.5.0 :024 > @emp = Employee.find_or_create_by(manager_id:17)
+  Employee Load (0.8ms)  SELECT  `employees`.* FROM `employees` WHERE `employees`.`manager_id` = 17 LIMIT 1
+   (0.3ms)  BEGIN
+  Employee Load (0.6ms)  SELECT  `employees`.* FROM `employees` WHERE `employees`.`id` = 17 LIMIT 1
+  SQL (1.0ms)  INSERT INTO `employees` (`created_at`, `updated_at`, `manager_id`) VALUES ('2018-05-04 19:13:34', '2018-05-04 19:13:34', 17)
+   (36.1ms)  COMMIT
+ => #<Employee id: 27, name: nil, created_at: "2018-05-04 19:13:34", updated_at: "2018-05-04 19:13:34", manager_id: 17> 
+2.5.0 :025 > 
+2.5.0 :026 > @emp = Employee.find_or_create_by(manager_id:18)
+  Employee Load (0.7ms)  SELECT  `employees`.* FROM `employees` WHERE `employees`.`manager_id` = 18 LIMIT 1
+   (0.5ms)  BEGIN
+  Employee Load (0.6ms)  SELECT  `employees`.* FROM `employees` WHERE `employees`.`id` = 18 LIMIT 1
+  SQL (0.7ms)  INSERT INTO `employees` (`created_at`, `updated_at`, `manager_id`) VALUES ('2018-05-04 19:13:38', '2018-05-04 19:13:38', 18)
+   (31.6ms)  COMMIT
+ => #<Employee id: 28, name: nil, created_at: "2018-05-04 19:13:38", updated_at: "2018-05-04 19:13:38", manager_id: 18> 
+2.5.0 :027 > 
+
+
+ find_or_initialize_by
+1.The find_or_initialize_by method will work just like find_or_create_by but it will call new instead of create.
+2. its wont create record it just initializes the record,inorder to create we need to call save
+
+nick = Employee.find_or_initialize_by(manager_id: 22)
+nick.save
+
+
+ Finding by SQL
+If you'd like to use your own SQL to find records in a table you can use find_by_sql
+
+2.5.0 :029 > @emps = Employee.find_by_sql("SELECT * FROM employees where id > 17")
+  Employee Load (30.2ms)  SELECT * FROM employees where id > 17
+ => [#<Employee id: 18, name: "employee7", created_at: "2018-05-04 17:27:50", updated_at: "2018-05-04 17:27:50", manager_id: nil>, #<Employee id: 19, name: "employee8", created_at: "2018-05-04 17:27:50", updated_at: "2018-05-04 17:27:50", manager_id: nil>, #<Employee id: 20, name: "employee9", created_at: "2018-05-04 17:27:50", updated_at: "2018-05-04 17:27:50", manager_id: nil>, #<Employee id: 21, name: "emp4", created_at: "2018-05-04 17:30:05", updated_at: "2018-05-04 17:30:05", manager_id: 12>, #<Employee id: 22, name: "emp5", created_at: "2018-05-04 17:30:23", updated_at: "2018-05-04 17:30:23", manager_id: 12>, #<Employee id: 23, name: "emp6", created_at: "2018-05-04 17:30:29", updated_at: "2018-05-04 17:30:29", manager_id: 12>, #<Employee id: 24, name: "emp7", created_at: "2018-05-04 17:30:38", updated_at: "2018-05-04 17:30:38", manager_id: 13>, #<Employee id: 25, name: "emp8", created_at: "2018-05-04 17:30:45", updated_at: "2018-05-04 17:30:45", manager_id: 13>, #<Employee id: 26, name: nil, created_at: "2018-05-04 19:13:24", updated_at: "2018-05-04 19:13:24", manager_id: 16>, #<Employee id: 27, name: nil, created_at: "2018-05-04 19:13:34", updated_at: "2018-05-04 19:13:34", manager_id: 17>, #<Employee id: 28, name: nil, created_at: "2018-05-04 19:13:38", updated_at: "2018-05-04 19:13:38", manager_id: 18>] 
+
+
+pluck
+pluck can be used to query single or multiple columns from the underlying table of a model. It accepts a list of column names 
+as argument and returns an array of values of the specified columns with the corresponding data type.
+
+2.5.0 :036 > Employee.all.pluck(:id)
+   (1.0ms)  SELECT `employees`.`id` FROM `employees`
+ => [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28] 
+2.5.0 :037 > Employee.all.pluck(:name)
+   (1.1ms)  SELECT `employees`.`name` FROM `employees`
+ => ["employee0", "employee1", "employee2", "employee3", "employee4", "employee5", "employee6", "employee7", "employee8", "employee9", "emp4", "emp5", "emp6", "emp7", "emp8", nil, nil, nil] 
+2.5.0 :038 > Employee.all.pluck(:manager_id)
+   (1.0ms)  SELECT `employees`.`manager_id` FROM `employees`
+ => [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, 12, 12, 12, 13, 13, 16, 17, 18] 
+2.5.0 :039 > Employee.all.pluck(:manager_id,:name)
+   (1.8ms)  SELECT `employees`.`manager_id`, `employees`.`name` FROM `employees`
+ => [[nil, "employee0"], [nil, "employee1"], [nil, "employee2"], [nil, "employee3"], [nil, "employee4"], [nil, "employee5"], [nil, "employee6"], [nil, "employee7"], [nil, "employee8"], [nil, "employee9"], [12, "emp4"], [12, "emp5"], [12, "emp6"], [13, "emp7"], [13, "emp8"], [16, nil], [17, nil], [18, nil]] 
+
+
+ids
+ids can be used to pluck all the IDs for the relation using the table's primary key.
+
+Employee.ids
+
+Existence of Objects;;
+
+
+Employee.exists?(1)
+Emplyee.exists?(id: [1,2,3])
+
+
